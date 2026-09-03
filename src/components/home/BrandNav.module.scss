@@ -1,0 +1,69 @@
+@use '../../styles/variables' as *;
+
+.brandNavContainer {
+  position: absolute;
+  top: 36px;
+  right: 48px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.brandTitleWrapper {
+  margin-bottom: 12px;
+}
+
+.brandTitle {
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  display: block;
+  text-transform: uppercase;
+}
+
+.navList {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.navItem {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #7b8390;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  transition: color $transition-fast, transform $transition-fast;
+
+  &:hover {
+    color: #ffffff;
+    transform: translateX(-4px);
+  }
+}
+
+.active {
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .brandNavContainer {
+    top: 24px;
+    right: 24px;
+  }
+
+  .brandTitle {
+    font-size: 3rem;
+  }
+
+  .navItem {
+    font-size: 0.9375rem;
+  }
+}

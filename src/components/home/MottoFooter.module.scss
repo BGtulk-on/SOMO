@@ -1,0 +1,29 @@
+@use '../../styles/variables' as *;
+
+.mottoContainer {
+  position: absolute;
+  bottom: 48px;
+  left: 48px;
+  z-index: 20;
+  pointer-events: auto;
+}
+
+.mottoText {
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  max-width: 600px;
+}
+
+@media (max-width: 768px) {
+  .mottoContainer {
+    bottom: 24px;
+    left: 24px;
+  }
+
+  .mottoText {
+    font-size: 1.875rem;
+  }
+}

@@ -1,0 +1,383 @@
+@use '../../styles/variables' as *;
+
+.heroCanvasWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+  will-change: transform, opacity;
+}
+
+/* Background Ambient Elements */
+.bgGridDots {
+  position: absolute;
+  top: 14%;
+  left: 18%;
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bgCoordinateCross {
+  position: absolute;
+  bottom: 22%;
+  right: 18%;
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 1. Star Stamp Badge (Cleanly spaced down from top-left logo) */
+.stickerStamp {
+  position: absolute;
+  top: 48%;
+  left: 16%;
+  width: 50px;
+  height: 50px;
+  background-color: #12151b;
+  border: 1.5px dashed #f16b24;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  user-select: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* 2. Floating Typography */
+.fontSpecimen {
+  position: absolute;
+  top: 20%;
+  left: 36%;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.fontBig {
+  font-family: $font-serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  line-height: 0.9;
+}
+
+.fontTag {
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  color: #8c96a5;
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* 3. Polaroid / Wireframe Photo */
+.photoFrame {
+  position: absolute;
+  top: 48%;
+  left: 38%;
+  width: 84px;
+  height: 110px;
+  background-color: #ffffff;
+  padding: 6px 6px 18px;
+  border-radius: 2px;
+  transform: rotate(6deg);
+  pointer-events: auto;
+  user-select: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+.photoInner {
+  width: 100%;
+  height: 100%;
+  background-color: #12151b;
+  border: 1px dashed #3a4454;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.photoCrossL,
+.photoCrossR {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.photoCrossL { transform: rotate(45deg); }
+.photoCrossR { transform: rotate(-45deg); }
+
+.photoLabel {
+  position: relative;
+  z-index: 2;
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #ffffff;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  letter-spacing: 0.1em;
+}
+
+/* 4. Radiant Icon */
+.radiantIcon {
+  position: absolute;
+  top: 38%;
+  left: 58%;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.rays {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ray {
+  position: absolute;
+  width: 1.5px;
+  height: 8px;
+  background-color: #4a5464;
+
+  &:nth-child(1) { transform: translateY(-44px); }
+  &:nth-child(2) { transform: rotate(45deg) translateY(-44px); }
+  &:nth-child(3) { transform: rotate(90deg) translateY(-44px); }
+  &:nth-child(4) { transform: rotate(135deg) translateY(-44px); }
+  &:nth-child(5) { transform: rotate(180deg) translateY(-44px); }
+  &:nth-child(6) { transform: rotate(225deg) translateY(-44px); }
+  &:nth-child(7) { transform: rotate(270deg) translateY(-44px); }
+  &:nth-child(8) { transform: rotate(315deg) translateY(-44px); }
+}
+
+.iconCenter {
+  position: relative;
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  background-color: #161a22;
+  border: 1px solid #2f3746;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 5. Geometric Ring */
+.ringGraphic {
+  position: absolute;
+  top: 14%;
+  left: 54%;
+  width: 42px;
+  height: 42px;
+  pointer-events: auto;
+}
+
+.ringCircle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1.5px solid #4a5568;
+}
+
+.ringCrosshairH {
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  right: -4px;
+  height: 1px;
+  background-color: #4a5568;
+}
+
+.ringCrosshairV {
+  position: absolute;
+  left: 50%;
+  top: -4px;
+  bottom: -4px;
+  width: 1px;
+  background-color: #4a5568;
+}
+
+/* 6. Color Swatch Fan */
+.colorSwatch {
+  position: absolute;
+  top: 60%;
+  left: 74%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transform: rotate(-10deg);
+  pointer-events: auto;
+  user-select: none;
+  cursor: grab;
+}
+
+.colorChipGreen,
+.colorChipOrange,
+.colorChipWhite {
+  padding: 6px 14px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  span {
+    font-family: $font-mono;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+}
+
+.colorChipGreen {
+  background-color: #439b38;
+  color: #ffffff;
+  width: 110px;
+}
+
+.colorChipOrange {
+  background-color: #f16b24;
+  color: #ffffff;
+  width: 125px;
+}
+
+.colorChipWhite {
+  background-color: #f2f4f8;
+  color: #0b0d11;
+  width: 140px;
+}
+
+.mottoWrapper {
+  position: absolute;
+  bottom: 48px;
+  left: 48px;
+  z-index: 50;
+  pointer-events: auto;
+  will-change: transform, opacity;
+}
+
+.mottoText {
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  max-width: 600px;
+}
+
+@keyframes makeItSubtlePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.025);
+  }
+}
+
+.makeItBtn {
+  display: inline-block;
+  vertical-align: baseline;
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 0 2px;
+  margin: 0;
+  cursor: pointer;
+  color: #f16b24;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-decoration: none;
+  pointer-events: auto;
+  z-index: 51;
+  transform-origin: center center;
+  animation: makeItSubtlePulse 3.4s ease-in-out infinite;
+  transition: transform $transition-fast;
+
+  &:hover {
+    animation-play-state: paused;
+    transform: translateY(-2px) scale(1.03);
+
+    .makeItWave path {
+      stroke: #52c244;
+    }
+  }
+
+  &:active {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.makeItLabel {
+  display: inline;
+  color: #f16b24;
+}
+
+.morphSlot {
+  display: inline-block;
+  position: relative;
+  width: 0.28em;
+  height: 0.96em;
+  vertical-align: -0.11em;
+  margin-left: 0.04em;
+  transition: width 0.28s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.makeItBtn:hover .morphSlot {
+  width: 0.88em;
+}
+
+.morphSvg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0.88em;
+  height: 0.96em;
+  max-width: none !important;
+  max-height: none !important;
+  display: block;
+  overflow: visible;
+}
+
+.makeItWave {
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 8px;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .stickerStamp { left: 10%; top: 46%; }
+  .fontSpecimen { left: 24%; top: 16%; }
+  .photoFrame { left: 38%; top: 46%; }
+  .radiantIcon { left: 62%; top: 38%; }
+  .colorSwatch { left: 60%; top: 64%; }
+  .mottoWrapper { bottom: 24px; left: 24px; }
+  .mottoText { font-size: 1.875rem; }
+}

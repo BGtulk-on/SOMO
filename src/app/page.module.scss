@@ -1,0 +1,15 @@
+@use '../styles/variables' as *;
+
+.pageContainer {
+  width: 100vw;
+  min-height: 400vh;
+  background-color: #0b0d11;
+}
+
+.pinnedViewport {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #0b0d11;
+}

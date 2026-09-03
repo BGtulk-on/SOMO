@@ -1,0 +1,333 @@
+@use '../../styles/variables' as *;
+
+.whatContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  padding: 100px 64px 80px;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.sketchMosaic {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 520px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* TOP ROW */
+.topRow {
+  display: flex;
+  gap: 14px;
+  height: 84px;
+}
+
+.swatchDeck {
+  flex: 1.7;
+  display: flex;
+  gap: 4px;
+  background-color: transparent;
+}
+
+.chipGreen,
+.chipOrange,
+.chipWhite {
+  flex: 1;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chipGreen {
+  background-color: #439b38;
+  color: #ffffff;
+}
+
+.chipOrange {
+  background-color: #f16b24;
+  color: #ffffff;
+}
+
+.chipWhite {
+  background-color: #f2f4f8;
+  color: #0e1116;
+}
+
+.chipHex {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.typeTile {
+  flex: 1;
+  background-color: #151922;
+  border-radius: 16px;
+  border: 1px solid #283242;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.typeLarge {
+  font-family: $font-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.typeSub {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  color: #8c96a5;
+}
+
+/* MIDDLE ROW */
+.middleRow {
+  display: flex;
+  gap: 14px;
+  height: 56px;
+}
+
+.stampTile {
+  width: 72px;
+  background-color: #181412;
+  border: 1.5px dashed #f16b24;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tokenBar {
+  flex: 1;
+  background-color: #12161f;
+  border: 1px solid #222a36;
+  border-radius: 50px;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.buttonToken {
+  background-color: #f16b24;
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.scaleSteps {
+  display: flex;
+  gap: 8px;
+  font-family: $font-mono;
+  font-size: 0.6875rem;
+  color: #64748b;
+
+  span {
+    padding: 2px 4px;
+  }
+}
+
+.activeStep {
+  color: #f2f4f8;
+  font-weight: 700;
+  border-bottom: 2px solid #439b38;
+}
+
+.toggleKnobWrapper {
+  width: 34px;
+  height: 20px;
+  background-color: #439b38;
+  border-radius: 50px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.knob {
+  width: 16px;
+  height: 16px;
+  background-color: #ffffff;
+  border-radius: 50%;
+}
+
+/* BOTTOM ROW */
+.bottomRow {
+  display: flex;
+  gap: 14px;
+  height: 120px;
+}
+
+.wireframeCanvas {
+  flex: 1.6;
+  background-color: #0e1218;
+  border: 1px solid #242c3b;
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.wireNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wireLogo {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #439b38;
+}
+
+.wireLinks {
+  display: flex;
+  gap: 6px;
+
+  span {
+    width: 24px;
+    height: 6px;
+    background-color: #1e2634;
+    border-radius: 2px;
+  }
+}
+
+.wireHero {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wireHeadline {
+  width: 80%;
+  height: 12px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  opacity: 0.85;
+}
+
+.wireTextLine {
+  width: 55%;
+  height: 6px;
+  background-color: #333f52;
+  border-radius: 2px;
+}
+
+.wireCta {
+  width: 48px;
+  height: 14px;
+  background-color: #f16b24;
+  border-radius: 3px;
+  margin-top: 4px;
+}
+
+.polaroidSlide {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 6px 6px 20px;
+  transform: rotate(2deg);
+}
+
+.slideInner {
+  width: 100%;
+  height: 100%;
+  background-color: #0e1117;
+  border-radius: 6px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.aspectCross1,
+.aspectCross2 {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.aspectCross1 { transform: rotate(35deg); }
+.aspectCross2 { transform: rotate(-35deg); }
+
+.slideTag {
+  position: relative;
+  z-index: 2;
+  font-family: $font-mono;
+  font-size: 0.5625rem;
+  color: #8c96a5;
+  letter-spacing: 0.05em;
+}
+
+/* RIGHT CONTENT */
+.contentColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 480px;
+}
+
+.heading {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  margin-bottom: 24px;
+}
+
+.description {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #8c96a5;
+}
+
+@media (max-width: 1024px) {
+  .whatContainer {
+    grid-template-columns: 1fr;
+    padding: 90px 24px 48px;
+    overflow-y: auto;
+  }
+
+  .sketchMosaic {
+    max-width: 100%;
+  }
+
+  .contentColumn {
+    max-width: 100%;
+    padding-right: 0;
+  }
+
+  .heading {
+    font-size: 1.75rem;
+  }
+}

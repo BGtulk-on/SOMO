@@ -1,0 +1,257 @@
+@use '../../styles/variables' as *;
+
+.canvasStage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.colorSwatchBox {
+  position: absolute;
+  top: 38%;
+  left: 20%;
+  width: 140px;
+  background-color: #161a20;
+  border: 1px solid #2a313d;
+  border-radius: $radius-md;
+  padding: 10px;
+  transform: rotate(-10deg);
+  pointer-events: auto;
+  user-select: none;
+  cursor: grab;
+}
+
+.swatchStrip {
+  height: 68px;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+  border: 1px solid #2a313d;
+}
+
+.swatchSegmentGreen {
+  flex: 1;
+  background-color: #439b38;
+}
+
+.swatchSegmentOrange {
+  flex: 1;
+  background-color: #f16b24;
+}
+
+.swatchSegmentWhite {
+  flex: 1;
+  background-color: #f2f4f8;
+}
+
+.swatchFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.swatchCode {
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  color: #8c96a5;
+}
+
+.swatchName {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #f2f4f8;
+  letter-spacing: 0.04em;
+}
+
+.fontSpecimenBox {
+  position: absolute;
+  top: 22%;
+  left: 36%;
+  background-color: #161a20;
+  border: 1px solid #2a313d;
+  border-radius: $radius-md;
+  padding: 12px 18px;
+  pointer-events: auto;
+  user-select: none;
+  transform: rotate(2deg);
+}
+
+.fontDisplay {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.fontMeta {
+  display: flex;
+  gap: 8px;
+  font-family: $font-mono;
+  font-size: 0.625rem;
+  color: #8c96a5;
+}
+
+.imageHolderBox {
+  position: absolute;
+  top: 48%;
+  left: 42%;
+  width: 90px;
+  background-color: #161a20;
+  border: 1px solid #2a313d;
+  border-radius: $radius-sm;
+  padding: 8px;
+  pointer-events: auto;
+  user-select: none;
+  transform: rotate(4deg);
+}
+
+.imageFrame {
+  height: 96px;
+  border: 1px dashed #3d4655;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: #0e1115;
+}
+
+.frameTag {
+  font-size: 0.6875rem;
+  font-family: $font-mono;
+  color: #ffffff;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  letter-spacing: 0.06em;
+}
+
+.imageCaption {
+  font-family: $font-mono;
+  font-size: 0.5625rem;
+  color: #8c96a5;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.radiantIconCard {
+  position: absolute;
+  top: 45%;
+  left: 62%;
+  width: 84px;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.radiantRays {
+  position: absolute;
+  width: 124px;
+  height: 124px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ray {
+  position: absolute;
+  width: 2px;
+  height: 10px;
+  background-color: #3d4655;
+
+  &:nth-child(1) { transform: translateY(-52px); }
+  &:nth-child(2) { transform: rotate(45deg) translateY(-52px); }
+  &:nth-child(3) { transform: rotate(90deg) translateY(-52px); }
+  &:nth-child(4) { transform: rotate(135deg) translateY(-52px); }
+  &:nth-child(5) { transform: rotate(180deg) translateY(-52px); }
+  &:nth-child(6) { transform: rotate(225deg) translateY(-52px); }
+  &:nth-child(7) { transform: rotate(270deg) translateY(-52px); }
+  &:nth-child(8) { transform: rotate(315deg) translateY(-52px); }
+}
+
+.iconInner {
+  position: relative;
+  z-index: 2;
+  width: 60px;
+  height: 60px;
+  background-color: #161a20;
+  border: 1px solid #2a313d;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floatingRing {
+  position: absolute;
+  top: 18%;
+  left: 54%;
+  pointer-events: auto;
+}
+
+.ringCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #3d4655;
+  background-color: transparent;
+}
+
+.stampBadge {
+  position: absolute;
+  top: 64%;
+  left: 80%;
+  width: 44px;
+  height: 44px;
+  background-color: #161a20;
+  border: 1px solid #2a313d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  user-select: none;
+}
+
+@media (max-width: 900px) {
+  .colorSwatchBox {
+    left: 12%;
+    top: 44%;
+    transform: scale(0.85);
+  }
+
+  .fontSpecimenBox {
+    left: 28%;
+    top: 20%;
+    transform: scale(0.85);
+  }
+
+  .imageHolderBox {
+    left: 44%;
+    top: 48%;
+    transform: scale(0.85);
+  }
+
+  .radiantIconCard {
+    left: 66%;
+    top: 44%;
+    transform: scale(0.85);
+  }
+
+  .stampBadge {
+    left: 78%;
+    top: 72%;
+    transform: scale(0.85);
+  }
+}
