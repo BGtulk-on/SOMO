@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@better-auth/passkey": "^1.7.2",
     "@gsap/react": "^2.1.1",
