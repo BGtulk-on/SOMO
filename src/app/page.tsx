@@ -58,12 +58,12 @@ export default function HomePage() {
               if (isNavigatingRef.current) {
                 return value;
               }
-              if (self.direction === 1) {
+              if (self?.direction === 1) {
                 if (value > 0.78) return 1;
                 if (value > 0.45) return 0.6667;
                 if (value > 0.12) return 0.3333;
                 return 0;
-              } else if (self.direction === -1) {
+              } else if (self?.direction === -1) {
                 if (value < 0.22) return 0;
                 if (value < 0.55) return 0.3333;
                 if (value < 0.88) return 0.6667;
