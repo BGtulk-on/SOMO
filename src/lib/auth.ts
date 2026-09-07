@@ -8,14 +8,49 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
+const getBaseURL = () => {
+  if (process.env.BETTER_AUTH_URL) return process.env.BETTER_AUTH_URL;
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  if (process.env.NODE_ENV === 'production') return 'https://somo.bgtulk.dev';
+  return 'http://localhost:3000';
+};
+
 export const auth = betterAuth({
   database: pool,
-  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-  trustedOrigins: [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-  ],
+  baseURL: getBaseURL(),
+  trustedOrigins: async (request) => {
+    const origin = request?.headers?.get('origin') || request?.headers?.get('referer');
+    const staticOrigins = [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+      'https://somo.bgtulk.dev',
+      'http://somo.bgtulk.dev',
+      'https://*.bgtulk.dev',
+      'http://*.bgtulk.dev',
+      'https://*.vercel.app',
+      ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
+      ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
+      ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+      ...(process.env.VERCEL_PROJECT_PRODUCTION_URL ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`] : []),
+    ].filter(Boolean) as string[];
+
+    if (origin) {
+      try {
+        const parsed = new URL(origin);
+        if (
+          parsed.hostname.endsWith('bgtulk.dev') ||
+          parsed.hostname.endsWith('vercel.app') ||
+          parsed.hostname === 'localhost' ||
+          parsed.hostname === '127.0.0.1'
+        ) {
+          return [...staticOrigins, parsed.origin];
+        }
+      } catch {}
+    }
+    return staticOrigins;
+  },
   secret: process.env.BETTER_AUTH_SECRET || 'dev-secret-key-change-in-production',
   emailAndPassword: {
     enabled: true,
