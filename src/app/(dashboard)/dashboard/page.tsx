@@ -1,24 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession, signOut } from '@/lib/auth-client';
 import styles from './dashboard.module.scss';
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
   const [projectName, setProjectName] = useState('');
 
+  useEffect(() => {
+    if (!isPending && !session?.user) {
+      window.location.href = '/login';
+    }
+  }, [session, isPending]);
+
   const handleSignOut = async () => {
-    await signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          window.location.href = '/login';
-        },
-      },
-    });
+    try {
+      await signOut();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      window.location.href = '/login';
+    }
   };
 
   const handleCreateProject = (e: React.FormEvent) => {

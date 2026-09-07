@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
-import { signIn, signUp, sendVerificationEmail } from '@/lib/auth-client';
+import { signIn, signUp, sendVerificationEmail, useSession } from '@/lib/auth-client';
 import styles from './AuthCard.module.scss';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -15,6 +15,7 @@ interface AuthCardProps {
 }
 
 export function AuthCard({ initialMode }: AuthCardProps) {
+  const { data: session } = useSession();
   const [mode, setMode] = useState<'LOGIN' | 'REGISTER'>(initialMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -49,6 +50,12 @@ export function AuthCard({ initialMode }: AuthCardProps) {
 
   const isPasswordValid = password.length >= 8;
   const showPasswordError = passwordTouched && (mode === 'REGISTER' ? !isPasswordValid : !password);
+
+  useEffect(() => {
+    if (session?.user) {
+      window.location.href = '/dashboard';
+    }
+  }, [session]);
 
   useEffect(() => {
     const handlePopState = () => {
