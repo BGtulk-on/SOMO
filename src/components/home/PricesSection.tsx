@@ -156,7 +156,7 @@ export const PricesSection = forwardRef<HTMLDivElement>((_, ref) => {
                   </li>
                   <li className={styles.featureItem}>
                     <span className={styles.checkIcon}>✓</span>
-                    <span>Icons up to 10</span>
+                    <span>Icons up to 9</span>
                   </li>
                   <li className={styles.featureItem}>
                     <span className={styles.checkIcon}>✓</span>

@@ -1,0 +1,325 @@
+@use '../../styles/variables' as *;
+
+.authContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: $color-bg-primary;
+  position: relative;
+  overflow: hidden;
+}
+
+.authCard {
+  width: 100%;
+  max-width: 440px;
+  background-color: $color-bg-secondary;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: 38px 32px;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.logoRow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  text-decoration: none;
+}
+
+.logoTrack {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoEmblem {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.brandTitle {
+  font-family: $font-sans;
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: 0.04em;
+  color: $color-text-primary;
+}
+
+.headerContent {
+  position: relative;
+  min-height: 52px;
+}
+
+.title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: $color-text-primary;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 0.84rem;
+  color: $color-text-muted;
+  line-height: 1.4;
+}
+
+.errorBanner {
+  background-color: rgba($color-danger, 0.1);
+  border: 1px solid rgba($color-danger, 0.3);
+  color: #fca5a5;
+  padding: 10px 14px;
+  border-radius: $radius-md;
+  font-size: 0.8125rem;
+  margin-bottom: 20px;
+}
+
+.successBox {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background-color: $color-brand-green;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  will-change: width, height, transform, border-radius, opacity;
+}
+
+.successTick {
+  width: 44px;
+  height: 44px;
+  color: #ffffff;
+  stroke: #ffffff;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.passkeySection {
+  overflow: hidden;
+  will-change: height, opacity, transform;
+}
+
+.passkeyInner {
+  padding-bottom: 4px;
+}
+
+.passkeyBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: $color-bg-elevated;
+  border: 1px solid $color-border;
+  color: $color-text-primary;
+  padding: 11px;
+  border-radius: $radius-md;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: border-color $transition-fast, background-color $transition-fast;
+
+  &:hover:not(:disabled) {
+    border-color: $color-border-hover;
+    background-color: #28303b;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.passkeyIcon {
+  font-size: 1rem;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0 16px;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid $color-border;
+  }
+
+  span {
+    padding: 0 12px;
+    font-size: 0.75rem;
+    color: $color-text-dim;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nameCollapsible {
+  overflow: hidden;
+  will-change: height, opacity, transform;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: $color-text-primary;
+  }
+
+  input {
+    background-color: $color-bg-primary;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    color: $color-text-primary;
+    transition: border-color $transition-fast;
+
+    &:focus {
+      border-color: $color-accent;
+    }
+
+    &.inputError {
+      border-color: #ef4444;
+
+      &:focus {
+        border-color: #ef4444;
+      }
+    }
+
+    &::placeholder {
+      color: $color-text-dim;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.errorHint {
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 2px;
+}
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  input {
+    width: 100%;
+    padding-right: 40px;
+  }
+}
+
+.eyeButton {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $color-text-dim;
+  border-radius: $radius-sm;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $color-text-primary;
+  }
+
+  &:focus {
+    outline: none;
+    color: $color-accent;
+  }
+}
+
+.submitBtn {
+  background-color: $color-accent;
+  color: $color-accent-text;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 12px;
+  border-radius: $radius-md;
+  margin-top: 4px;
+  transition: background-color $transition-fast;
+  position: relative;
+  overflow: hidden;
+
+  &:hover:not(:disabled) {
+    background-color: $color-accent-hover;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btnText {
+  display: block;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 0.8125rem;
+  color: $color-text-muted;
+}
+
+.switchBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 5px;
+  color: $color-accent;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color $transition-fast;
+
+  &:hover {
+    text-decoration: underline;
+    color: $color-accent-hover;
+  }
+}

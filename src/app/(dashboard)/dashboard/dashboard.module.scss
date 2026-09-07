@@ -1,4 +1,276 @@
+@use '../../../styles/variables' as *;
+
 .dashboardContainer {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: $color-bg-primary;
+  color: $color-text-primary;
+  font-family: $font-sans;
+}
+
+.topNav {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  border-bottom: 1px solid $color-border;
+  background-color: $color-bg-secondary;
+  height: 52px;
+}
+
+.tabPremium {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 32px;
+  background-color: rgba($color-brand-orange, 0.14);
+  color: $color-brand-orange;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-right: 1px solid $color-border;
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: rgba($color-brand-orange, 0.22);
+  }
+}
+
+.tabHome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: $color-text-primary;
+  user-select: none;
+}
+
+.tabAccount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 32px;
+  background-color: rgba($color-brand-green, 0.14);
+  color: $color-brand-green;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-left: 1px solid $color-border;
+  border-top: none;
+  border-bottom: none;
+  border-right: none;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: rgba($color-brand-green, 0.22);
+  }
+}
+
+.canvas {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.shapesWrapper {
+  position: relative;
+  width: 240px;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.largeBox {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  left: 18px;
+  top: 25px;
+  background-color: $color-brand-orange;
+  border: 2px solid #000000;
+  border-radius: 30px;
+  transform: rotate(-16deg);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: rotate(-12deg) scale(1.02);
+  }
+}
+
+.smallBox {
+  position: absolute;
+  width: 68px;
+  height: 68px;
+  right: 26px;
+  top: 32px;
+  background-color: $color-brand-green;
+  border: 2px solid #000000;
+  border-radius: 17px;
+  transform: rotate(22deg);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: rotate(26deg) scale(1.04);
+  }
+}
+
+.emptyPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.emptyNotice {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: $color-text-muted;
+  margin: 0;
+}
+
+.createLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: $color-text-primary;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $color-brand-orange;
+  }
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.modalCard {
   width: 100%;
+  max-width: 420px;
+  background-color: $color-bg-secondary;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: 28px;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: $color-text-primary;
+}
+
+.modalSubtitle {
+  font-size: 0.875rem;
+  color: $color-text-muted;
+  margin-bottom: 20px;
+}
+
+.modalInput {
+  width: 100%;
+  background-color: $color-bg-primary;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  padding: 10px 14px;
+  color: $color-text-primary;
+  font-size: 0.875rem;
+  margin-bottom: 20px;
+
+  &:focus {
+    border-color: $color-accent;
+    outline: none;
+  }
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: 1px solid $color-border;
+  color: $color-text-muted;
+  padding: 9px 16px;
+  border-radius: $radius-md;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $color-text-primary;
+  }
+}
+
+.confirmBtn {
+  background-color: $color-accent;
+  border: none;
+  color: $color-accent-text;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: $radius-md;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $color-accent-hover;
+  }
+}
+
+.signOutBtn {
+  width: 100%;
+  background-color: transparent;
+  border: 1px solid $color-border;
+  color: $color-danger;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: $radius-md;
+  font-size: 0.875rem;
+  cursor: pointer;
+  margin-top: 14px;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: rgba($color-danger, 0.1);
+  }
+}
+
+.userInfoRow {
+  padding: 12px 0;
+  border-bottom: 1px solid $color-border;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+
+  span:first-child {
+    color: $color-text-muted;
+  }
+
+  span:last-child {
+    color: $color-text-primary;
+    font-weight: 500;
+  }
 }

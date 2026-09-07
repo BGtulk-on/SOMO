@@ -17,6 +17,7 @@
 .DS_Store
 *.pem
 .gemini/
+desing.png
 
 # debug
 npm-debug.log*
