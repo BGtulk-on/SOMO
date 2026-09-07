@@ -1,25 +1,8 @@
 import { betterAuth } from 'better-auth';
 import { passkey } from '@better-auth/passkey';
 import { twoFactor } from 'better-auth/plugins';
-import { Pool } from 'pg';
+import { pool } from './db';
 import { Resend } from 'resend';
-
-const rawConnectionString =
-  process.env.SOMO_DB_POSTGRES_URL ||
-  process.env.SOMO_DB_POSTGRES_URL_NON_POOLING ||
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL;
-
-const connectionString = rawConnectionString
-  ? rawConnectionString.replace(/\?.*$/, '')
-  : undefined;
-
-const pool = connectionString
-  ? new Pool({
-      connectionString,
-      ssl: { rejectUnauthorized: false },
-    })
-  : undefined;
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -28,18 +11,25 @@ const resend = process.env.RESEND_API_KEY
 export const auth = betterAuth({
   database: pool,
   baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  trustedOrigins: [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  ],
   secret: process.env.BETTER_AUTH_SECRET || 'dev-secret-key-change-in-production',
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    requireEmailVerification: false,
   },
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      if (resend) {
+      const apiKey = process.env.RESEND_API_KEY;
+      const resendClient = apiKey ? new Resend(apiKey) : null;
+      if (resendClient) {
         try {
-          await resend.emails.send({
+          const { data, error } = await resendClient.emails.send({
             from: process.env.EMAIL_FROM || 'SOMO <onboarding@resend.dev>',
             to: user.email,
             subject: 'Verify your email - SOMO',
@@ -60,8 +50,13 @@ export const auth = betterAuth({
               </div>
             `,
           });
+          if (error) {
+            console.error('[Resend Error]:', error);
+            console.log('Verification URL fallback:', url);
+          }
         } catch (error) {
           console.error('[Resend Error]:', error);
+          console.log('Verification URL fallback:', url);
         }
       } else {
         console.log('\n================ VERIFICATION EMAIL ================');

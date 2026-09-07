@@ -35,12 +35,12 @@ export function AuthCard({ initialMode }: AuthCardProps) {
   const logoRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const passkeySectionRef = useRef<HTMLDivElement>(null);
   const nameFieldRef = useRef<HTMLDivElement>(null);
   const btnTextRef = useRef<HTMLSpanElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const successBoxRef = useRef<HTMLDivElement>(null);
   const tickRef = useRef<SVGSVGElement>(null);
+  const isSuccessAnimatingRef = useRef(false);
 
   const isNameValid = NAME_REGEX.test(name.trim());
   const showNameError = mode === 'REGISTER' && nameTouched && !isNameValid;
@@ -52,7 +52,7 @@ export function AuthCard({ initialMode }: AuthCardProps) {
   const showPasswordError = passwordTouched && (mode === 'REGISTER' ? !isPasswordValid : !password);
 
   useEffect(() => {
-    if (session?.user) {
+    if (session?.user && !isSuccessAnimatingRef.current) {
       window.location.href = '/dashboard';
     }
   }, [session]);
@@ -67,6 +67,12 @@ export function AuthCard({ initialMode }: AuthCardProps) {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  useEffect(() => {
+    if (initialMode !== mode) {
+      animateSwitch(initialMode, false);
+    }
+  }, [initialMode]);
 
   const animateSwitch = (targetMode: 'LOGIN' | 'REGISTER', pushState = true) => {
     if (targetMode === mode) return;
@@ -109,19 +115,12 @@ export function AuthCard({ initialMode }: AuthCardProps) {
     }
 
     if (isToRegister) {
-      if (passkeySectionRef.current) {
-        gsap.to(passkeySectionRef.current, {
-          height: 0,
-          opacity: 0,
-          duration: 0.3,
-          ease: 'power2.inOut',
-        });
-      }
       if (nameFieldRef.current) {
+        nameFieldRef.current.style.display = 'block';
         gsap.fromTo(
           nameFieldRef.current,
           { height: 0, opacity: 0, y: -10 },
-          { height: 'auto', opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }
+          { height: 'auto', opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }
         );
       }
     } else {
@@ -129,16 +128,14 @@ export function AuthCard({ initialMode }: AuthCardProps) {
         gsap.to(nameFieldRef.current, {
           height: 0,
           opacity: 0,
-          duration: 0.3,
-          ease: 'power2.inOut',
+          duration: 0.25,
+          ease: 'power2.in',
+          onComplete: () => {
+            if (nameFieldRef.current) {
+              nameFieldRef.current.style.display = 'none';
+            }
+          },
         });
-      }
-      if (passkeySectionRef.current) {
-        gsap.fromTo(
-          passkeySectionRef.current,
-          { height: 0, opacity: 0, y: -10 },
-          { height: 'auto', opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }
-        );
       }
     }
 
@@ -182,7 +179,7 @@ export function AuthCard({ initialMode }: AuthCardProps) {
         } else {
           setTimeout(() => {
             window.location.href = '/dashboard';
-          }, 180);
+          }, 360);
         }
       },
     });
@@ -270,7 +267,6 @@ export function AuthCard({ initialMode }: AuthCardProps) {
       const res = await signIn.email({
         email,
         password,
-        callbackURL: '/dashboard',
       });
 
       if (res?.error) {
@@ -283,6 +279,7 @@ export function AuthCard({ initialMode }: AuthCardProps) {
         return;
       }
 
+      isSuccessAnimatingRef.current = true;
       playSuccessAnimation(false);
     } catch (err: any) {
       setErrorMessage(err?.message || 'Authentication failed');
@@ -307,7 +304,6 @@ export function AuthCard({ initialMode }: AuthCardProps) {
         email,
         password,
         name,
-        callbackURL: '/dashboard',
       });
 
       if (res?.error) {
@@ -316,6 +312,7 @@ export function AuthCard({ initialMode }: AuthCardProps) {
         return;
       }
 
+      isSuccessAnimatingRef.current = true;
       playSuccessAnimation(true);
     } catch (err: any) {
       setErrorMessage(err?.message || 'Registration failed');
@@ -415,37 +412,16 @@ export function AuthCard({ initialMode }: AuthCardProps) {
           </div>
         ) : (
           <>
-            <div
-              ref={passkeySectionRef}
-          className={styles.passkeySection}
-          style={{
-            height: initialMode === 'REGISTER' ? 0 : 'auto',
-            opacity: initialMode === 'REGISTER' ? 0 : 1,
-            display: initialMode === 'REGISTER' ? 'none' : 'block',
-          }}
-        >
-          <div className={styles.passkeyInner}>
-            <button type="button" disabled={true} className={styles.passkeyBtn}>
-              <span className={styles.passkeyIcon}>🔑</span>
-              Sign in with Passkey (currently not working)
-            </button>
-
-            <div className={styles.divider}>
-              <span>or continue with email</span>
-            </div>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div
-            ref={nameFieldRef}
-            className={styles.nameCollapsible}
-            style={{
-              height: initialMode === 'LOGIN' ? 0 : 'auto',
-              opacity: initialMode === 'LOGIN' ? 0 : 1,
-              display: initialMode === 'LOGIN' ? 'none' : 'block',
-            }}
-          >
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <div
+                ref={nameFieldRef}
+                className={styles.nameCollapsible}
+                style={{
+                  height: mode === 'LOGIN' ? 0 : 'auto',
+                  opacity: mode === 'LOGIN' ? 0 : 1,
+                  display: mode === 'LOGIN' ? 'none' : 'block',
+                }}
+              >
             <div className={styles.inputGroup}>
               <label htmlFor="auth-name">Full Name</label>
               <input
@@ -572,8 +548,8 @@ export function AuthCard({ initialMode }: AuthCardProps) {
                   ? 'Authenticating...'
                   : 'Creating Account...'
                 : mode === 'LOGIN'
-                ? 'Sign In'
-                : 'Create Account'}
+                ? 'Continue Designing'
+                : 'Start Designing'}
             </span>
           </button>
         </form>

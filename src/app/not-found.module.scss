@@ -1,0 +1,264 @@
+@use '../styles/variables' as *;
+
+.notFoundContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: $color-bg-primary;
+  color: $color-text-primary;
+  font-family: $font-sans;
+}
+
+.topNav {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  border: 1px solid $color-border;
+  background-color: $color-bg-secondary;
+  height: 52px;
+}
+
+.tabPremium {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  line-height: 1;
+  padding: 0 24px;
+  margin: 7px 0 7px 12px;
+  border-radius: 7px;
+  background-color: rgba($color-brand-orange, 0.12);
+  color: $color-brand-orange;
+  font-family: $font-sans;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  border: 1px solid #222937;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: rgba($color-brand-orange, 0.22);
+    border-color: #f16b24;
+  }
+}
+
+.tabHome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  line-height: 1;
+  font-family: $font-sans;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: $color-text-primary;
+  text-decoration: none;
+  user-select: none;
+}
+
+.tabAccount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  line-height: 1;
+  padding: 0 24px;
+  margin: 7px 12px 7px 0;
+  border-radius: 7px;
+  background-color: rgba(67, 155, 56, 0.12);
+  color: $color-brand-green;
+  font-family: $font-sans;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  border: 1px solid #222937;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: rgba(67, 155, 56, 0.22);
+    border-color: #439b38;
+  }
+}
+
+.canvasArea {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 40px 24px;
+}
+
+.diamondShape {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  left: 14%;
+  top: 18%;
+  background-color: $color-brand-orange;
+  border: 2px solid #000000;
+  border-radius: 20px;
+  transform: rotate(45deg);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: rotate(50deg) scale(1.06);
+  }
+}
+
+.topRightGroup {
+  position: absolute;
+  right: 12%;
+  top: 14%;
+  width: 190px;
+  height: 150px;
+  pointer-events: none;
+}
+
+.outlineRectangle {
+  position: absolute;
+  width: 145px;
+  height: 92px;
+  right: 24px;
+  top: 12px;
+  background-color: $color-brand-orange;
+  border: 2px solid #000000;
+  border-radius: 24px;
+  transform: rotate(-35deg);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: rotate(-30deg) scale(1.04);
+  }
+}
+
+.accentSquare {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  right: 14px;
+  top: 80px;
+  background-color: $color-brand-green;
+  border: 2px solid #000000;
+  border-radius: 12px;
+  transform: rotate(8deg);
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 2;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: rotate(18deg) scale(1.1);
+  }
+}
+
+.bottomLeftGroup {
+  position: absolute;
+  left: 14%;
+  bottom: 14%;
+  width: 170px;
+  height: 140px;
+  pointer-events: none;
+}
+
+.greenSquare {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  left: 10px;
+  bottom: 22px;
+  background-color: $color-brand-green;
+  border: 2px solid #000000;
+  border-radius: 22px;
+  transform: rotate(16deg);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: rotate(22deg) scale(1.05);
+  }
+}
+
+.circleShape {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  left: 74px;
+  bottom: 12px;
+  background-color: #f2f4f8;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 2;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+}
+
+.centerPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 2;
+}
+
+.errorCode {
+  font-size: 4rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: $color-text-primary;
+  line-height: 1;
+  margin: 0 0 14px;
+}
+
+.errorMessage {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: $color-text-muted;
+  margin: 0 0 18px;
+}
+
+.backLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: $color-text-primary;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $color-brand-orange;
+  }
+}
+
+@media (max-width: 800px) {
+  .diamondShape,
+  .topRightGroup,
+  .bottomLeftGroup {
+    display: none;
+  }
+
+  .errorCode {
+    font-size: 3rem;
+  }
+
+  .errorMessage {
+    font-size: 1.1rem;
+  }
+}
