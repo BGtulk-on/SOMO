@@ -304,6 +304,7 @@ export function AuthCard({ initialMode }: AuthCardProps) {
         email,
         password,
         name,
+        callbackURL: '/dashboard',
       });
 
       if (res?.error) {
