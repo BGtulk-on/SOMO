@@ -2,26 +2,26 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSession, signOut } from '@/lib/auth-client';
+import { ProjectCanvas, type Project, type ProjectData } from '@/components/dashboard/ProjectCanvas';
 import styles from './dashboard.module.scss';
-
-interface Project {
-  id: string;
-  name: string;
-  createdAt: number;
-}
 
 export default function DashboardPage() {
   const { data: session, isPending, refetch } = useSession();
   const [hasResolved, setHasResolved] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [projectName, setProjectName] = useState('New Project');
+  const [editProjectName, setEditProjectName] = useState('');
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
+  const [isProjectSettingsOpen, setIsProjectSettingsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const activeProject = projects.find((p) => p.id === activeProjectId) || null;
 
   const triggerClose = () => {
     if (!isCreating || isClosing) return;
@@ -117,20 +117,48 @@ export default function DashboardPage() {
         if (isCreating) triggerClose();
         if (isPremiumOpen) setIsPremiumOpen(false);
         if (isAccountOpen) setIsAccountOpen(false);
+        if (isProjectSettingsOpen) setIsProjectSettingsOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCreating, isClosing, isPremiumOpen, isAccountOpen]);
+  }, [isCreating, isClosing, isPremiumOpen, isAccountOpen, isProjectSettingsOpen]);
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            window.location.href = '/login';
+          },
+        },
+      });
     } catch (err) {
       console.error(err);
-    } finally {
-      window.location.href = '/login';
     }
+    document.cookie = 'better-auth.session_token=; Max-Age=0; path=/;';
+    document.cookie = 'better-auth.session_data=; Max-Age=0; path=/;';
+    document.cookie = 'better-auth.dont_remember=; Max-Age=0; path=/;';
+    window.location.href = '/login';
+  };
+
+  const handleViewProject = (projectId: string) => {
+    const proj = projects.find((p) => p.id === projectId);
+    if (proj) {
+      setEditProjectName(proj.name);
+    }
+    setActiveProjectId(projectId);
+    setIsAccountOpen(false);
+    setIsPremiumOpen(false);
+    setIsProjectSettingsOpen(false);
+  };
+
+  const handleGoHome = () => {
+    setActiveProjectId(null);
+    setIsAccountOpen(false);
+    setIsPremiumOpen(false);
+    setIsProjectSettingsOpen(false);
+    if (isCreating) triggerClose();
   };
 
   const handleStartCreate = () => {
@@ -157,9 +185,10 @@ export default function DashboardPage() {
       id: tempId,
       name: trimmed,
       createdAt: Date.now(),
+      data: {},
     };
 
-    const nextProjects = [newProject, ...projects];
+    const nextProjects = [...projects, newProject];
     setProjects(nextProjects);
 
     try {
@@ -170,12 +199,13 @@ export default function DashboardPage() {
 
     setIsCreating(false);
     setProjectName('');
+    handleViewProject(tempId);
 
     try {
       const res = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: trimmed }),
+        body: JSON.stringify({ name: trimmed, data: {} }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -187,8 +217,77 @@ export default function DashboardPage() {
             } catch {}
             return updated;
           });
+          if (activeProjectId === tempId) {
+            setActiveProjectId(data.project.id);
+          }
         }
       }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateProject = async (updatedProject: Project) => {
+    setProjects((prev) => {
+      const next = prev.map((p) => (p.id === updatedProject.id ? updatedProject : p));
+      try {
+        localStorage.setItem('somo_projects', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+
+    try {
+      await fetch(`/api/projects/${updatedProject.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: updatedProject.name,
+          data: updatedProject.data,
+        }),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRenameSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeProject) return;
+    const trimmed = editProjectName.trim();
+    if (!trimmed) return;
+    handleUpdateProject({
+      ...activeProject,
+      name: trimmed,
+    });
+  };
+
+  const handleToggleSharpLines = () => {
+    if (!activeProject) return;
+    const nextData: ProjectData = {
+      ...(activeProject.data || {}),
+      sharpLines: !activeProject.data?.sharpLines,
+    };
+    handleUpdateProject({
+      ...activeProject,
+      data: nextData,
+    });
+  };
+
+  const handleDeleteActiveProject = async () => {
+    if (!activeProject) return;
+    const targetId = activeProject.id;
+    setProjects((prev) => {
+      const next = prev.filter((p) => p.id !== targetId);
+      try {
+        localStorage.setItem('somo_projects', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+    setActiveProjectId(null);
+    setIsProjectSettingsOpen(false);
+
+    try {
+      await fetch(`/api/projects/${targetId}`, { method: 'DELETE' });
     } catch (err) {
       console.error(err);
     }
@@ -213,7 +312,11 @@ export default function DashboardPage() {
       <header className={styles.topNav}>
         <button
           type="button"
-          onClick={() => setIsPremiumOpen((prev) => !prev)}
+          onClick={() => {
+            setIsPremiumOpen((prev) => !prev);
+            setIsAccountOpen(false);
+            setIsProjectSettingsOpen(false);
+          }}
           className={`${styles.tabPremium} ${isPremiumOpen ? styles.active : ''}`}
         >
           Premium
@@ -221,75 +324,49 @@ export default function DashboardPage() {
 
         <button
           type="button"
-          onClick={() => {
-            setIsPremiumOpen(false);
-            setIsAccountOpen(false);
-            if (isCreating) triggerClose();
-          }}
-          className={styles.tabHome}
+          onClick={handleGoHome}
+          className={`${styles.tabHome} ${!activeProject && !isPremiumOpen && !isAccountOpen ? styles.active : ''}`}
         >
           Home
         </button>
 
-        <button
-          type="button"
-          onClick={() => setIsAccountOpen((prev) => !prev)}
-          className={`${styles.tabAccount} ${isAccountOpen ? styles.active : ''}`}
-        >
-          Account
-        </button>
+        {activeProject ? (
+          <button
+            type="button"
+            onClick={() => {
+              setIsProjectSettingsOpen((prev) => !prev);
+              setIsPremiumOpen(false);
+            }}
+            className={`${styles.tabAccount} ${isProjectSettingsOpen ? styles.active : ''}`}
+          >
+            Settings
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setIsAccountOpen((prev) => !prev);
+              setIsPremiumOpen(false);
+            }}
+            className={`${styles.tabAccount} ${isAccountOpen ? styles.active : ''}`}
+          >
+            Account
+          </button>
+        )}
       </header>
 
       <main
-        className={`${styles.canvas} ${projects.length > 0 || isCreating ? styles.hasProjects : ''} ${isPremiumOpen || isAccountOpen ? styles.canvasBlurred : ''}`}
+        className={`${styles.canvasViewport} ${
+          isPremiumOpen || isAccountOpen || isProjectSettingsOpen ? styles.canvasBlurred : ''
+        }`}
       >
-        {projects.length === 0 ? (
-          isCreating ? (
-            <div
-              ref={boxRef}
-              className={`${styles.createProjectBox} ${isClosing ? styles.closing : ''}`}
-            >
-              <form onSubmit={handleCreateProject} className={styles.createProjectForm}>
-                <div className={styles.inputWrapper}>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                    className={styles.projectInput}
-                    placeholder="New Project"
-                    maxLength={60}
-                  />
-                </div>
-                <div className={styles.slashDivider} />
-                <button type="submit" className={styles.seeProjectBtn}>
-                  <span>SEE</span>
-                  <span>PROJECT</span>
-                </button>
-              </form>
-            </div>
-          ) : (
-            <div className={styles.emptyStateWrapper}>
-              <div className={styles.shapesWrapper}>
-                <div className={styles.largeBox} />
-                <div className={styles.smallBox} />
-              </div>
-
-              <div className={styles.emptyPrompt}>
-                <p className={styles.emptyNotice}>No projects yet...</p>
-                <button
-                  type="button"
-                  onClick={handleStartCreate}
-                  className={styles.createLink}
-                >
-                  Create new one?
-                </button>
-              </div>
-            </div>
-          )
-        ) : (
-          <div className={styles.projectsContainer}>
-            {isCreating && (
+        <div
+          className={`${styles.projectsSlidePanel} ${
+            projects.length > 0 || isCreating ? styles.hasProjects : ''
+          } ${activeProjectId ? styles.slideLeft : ''}`}
+        >
+          {projects.length === 0 ? (
+            isCreating ? (
               <div
                 ref={boxRef}
                 className={`${styles.createProjectBox} ${isClosing ? styles.closing : ''}`}
@@ -313,52 +390,115 @@ export default function DashboardPage() {
                   </button>
                 </form>
               </div>
-            )}
-
-            {projects.map((project) => (
-              <div key={project.id} className={styles.projectCard}>
-                <div className={styles.projectNameWrapper}>
-                  <span className={styles.projectName}>{project.name}</span>
+            ) : (
+              <div className={styles.emptyStateWrapper}>
+                <div className={styles.shapesWrapper}>
+                  <div className={styles.largeBox} />
+                  <div className={styles.smallBox} />
                 </div>
-                <div className={styles.slashDivider} />
-                <button type="button" className={styles.seeProjectBtn}>
-                  <span>SEE</span>
-                  <span>PROJECT</span>
-                </button>
-              </div>
-            ))}
 
-            {!isCreating && (
-              <button
-                type="button"
-                onClick={handleStartCreate}
-                className={styles.addProjectBtn}
-                aria-label="Add project"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <div className={styles.emptyPrompt}>
+                  <p className={styles.emptyNotice}>No projects yet...</p>
+                  <button
+                    type="button"
+                    onClick={handleStartCreate}
+                    className={styles.createLink}
+                  >
+                    Create new one?
+                  </button>
+                </div>
+              </div>
+            )
+          ) : (
+            <div className={styles.projectsContainer}>
+              {projects.map((project) => (
+                <div key={project.id} className={styles.projectCard}>
+                  <div className={styles.projectNameWrapper}>
+                    <span className={styles.projectName}>{project.name}</span>
+                  </div>
+                  <div className={styles.slashDivider} />
+                  <button
+                    type="button"
+                    onClick={() => handleViewProject(project.id)}
+                    className={styles.seeProjectBtn}
+                  >
+                    <span>SEE</span>
+                    <span>PROJECT</span>
+                  </button>
+                </div>
+              ))}
+
+              {isCreating && (
+                <div
+                  ref={boxRef}
+                  className={`${styles.createProjectBox} ${isClosing ? styles.closing : ''}`}
                 >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-              </button>
-            )}
-          </div>
-        )}
+                  <form onSubmit={handleCreateProject} className={styles.createProjectForm}>
+                    <div className={styles.inputWrapper}>
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        value={projectName}
+                        onChange={(e) => setProjectName(e.target.value)}
+                        className={styles.projectInput}
+                        placeholder="New Project"
+                        maxLength={60}
+                      />
+                    </div>
+                    <div className={styles.slashDivider} />
+                    <button type="submit" className={styles.seeProjectBtn}>
+                      <span>SEE</span>
+                      <span>PROJECT</span>
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {!isCreating && (
+                <button
+                  type="button"
+                  onClick={handleStartCreate}
+                  className={styles.addProjectBtn}
+                  aria-label="Add project"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className={`${styles.canvasSlidePanel} ${activeProjectId ? styles.slideIn : ''}`}>
+          {activeProject && (
+            <ProjectCanvas
+              project={activeProject}
+              onUpdateProject={handleUpdateProject}
+              onOpenSettings={() => setIsProjectSettingsOpen(true)}
+            />
+          )}
+        </div>
       </main>
 
       <div
-        className={`${styles.sidebarBackdrop} ${isPremiumOpen || isAccountOpen ? styles.open : ''}`}
+        className={`${styles.sidebarBackdrop} ${
+          isPremiumOpen || isAccountOpen || isProjectSettingsOpen ? styles.open : ''
+        }`}
         onClick={() => {
           setIsPremiumOpen(false);
           setIsAccountOpen(false);
+          setIsProjectSettingsOpen(false);
         }}
       />
 
@@ -441,6 +581,9 @@ export default function DashboardPage() {
 
           <div className={styles.accountActions}>
             <button type="button" className={styles.accountPillBtn}>
+              Details
+            </button>
+            <button type="button" className={styles.accountPillBtn}>
               Security
             </button>
             <button type="button" className={styles.accountPillBtn}>
@@ -459,6 +602,68 @@ export default function DashboardPage() {
             className={styles.logoutLink}
           >
             Log out
+          </button>
+        </div>
+      </aside>
+
+      <aside className={`${styles.projectSettingsSidebar} ${isProjectSettingsOpen ? styles.open : ''}`}>
+        <div className={styles.settingsTopGroup}>
+          <button
+            type="button"
+            onClick={() => setIsProjectSettingsOpen(false)}
+            className={styles.closeSidebarBtn}
+            aria-label="Close"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          <h2 className={styles.projectSettingsTitle}>
+            {activeProject?.name || 'Project'}
+            <span>Settings</span>
+          </h2>
+
+          <div className={styles.settingsActions}>
+            <div className={styles.settingBlock}>
+              <label className={styles.settingLabel}>Rename Project</label>
+              <form onSubmit={handleRenameSubmit} className={styles.renameForm}>
+                <input
+                  type="text"
+                  className={styles.renameInput}
+                  value={editProjectName}
+                  onChange={(e) => setEditProjectName(e.target.value)}
+                  placeholder="Project name..."
+                />
+                <button type="submit" className={styles.renameSaveBtn}>
+                  Save
+                </button>
+              </form>
+            </div>
+
+            <div className={styles.settingBlock}>
+              <button
+                type="button"
+                onClick={handleToggleSharpLines}
+                className={`${styles.sharpLinesToggleBtn} ${activeProject?.data?.sharpLines ? styles.active : ''}`}
+              >
+                <span>Sharp lines?</span>
+                <span className={styles.toggleStateBadge}>
+                  {activeProject?.data?.sharpLines ? 'ON' : 'OFF'}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.deleteProjectWrapper}>
+          <button
+            type="button"
+            onClick={handleDeleteActiveProject}
+            className={styles.deleteProjectBtn}
+          >
+            Delete Project
           </button>
         </div>
       </aside>

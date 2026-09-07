@@ -17,7 +17,7 @@ export async function GET() {
     }
 
     const result = await pool.query(
-      `SELECT "id", "name", "createdAt" FROM "project" WHERE "userId" = $1 ORDER BY "createdAt" DESC`,
+      `SELECT "id", "name", "createdAt", "data" FROM "project" WHERE "userId" = $1 ORDER BY "createdAt" ASC`,
       [session.user.id]
     );
 
@@ -25,6 +25,7 @@ export async function GET() {
       id: row.id,
       name: row.name,
       createdAt: new Date(row.createdAt).getTime(),
+      data: row.data || {},
     }));
 
     return Response.json({ projects });
@@ -46,6 +47,7 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const name = typeof body?.name === 'string' ? body.name.trim() : '';
+    const data = typeof body?.data === 'object' && body?.data !== null ? body.data : {};
 
     if (!name) {
       return Response.json({ error: 'Project name is required' }, { status: 400 });
@@ -59,13 +61,14 @@ export async function POST(req: Request) {
           id,
           name,
           createdAt: Date.now(),
+          data,
         },
       }, { status: 201 });
     }
 
     const result = await pool.query(
-      `INSERT INTO "project" ("id", "name", "userId", "createdAt", "updatedAt") VALUES ($1, $2, $3, NOW(), NOW()) RETURNING "id", "name", "createdAt"`,
-      [id, name, session.user.id]
+      `INSERT INTO "project" ("id", "name", "userId", "createdAt", "updatedAt", "data") VALUES ($1, $2, $3, NOW(), NOW(), $4) RETURNING "id", "name", "createdAt", "data"`,
+      [id, name, session.user.id, JSON.stringify(data)]
     );
 
     const created = result.rows[0];
@@ -75,6 +78,7 @@ export async function POST(req: Request) {
         id: created.id,
         name: created.name,
         createdAt: new Date(created.createdAt).getTime(),
+        data: created.data || {},
       },
     }, { status: 201 });
   } catch (error) {

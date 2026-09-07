@@ -15,7 +15,7 @@ interface AuthCardProps {
 }
 
 export function AuthCard({ initialMode }: AuthCardProps) {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const [mode, setMode] = useState<'LOGIN' | 'REGISTER'>(initialMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -52,10 +52,10 @@ export function AuthCard({ initialMode }: AuthCardProps) {
   const showPasswordError = passwordTouched && (mode === 'REGISTER' ? !isPasswordValid : !password);
 
   useEffect(() => {
-    if (session?.user && !isSuccessAnimatingRef.current) {
+    if (!isPending && session?.user && !isSuccessAnimatingRef.current) {
       window.location.href = '/dashboard';
     }
-  }, [session]);
+  }, [session, isPending]);
 
   useEffect(() => {
     const handlePopState = () => {

@@ -96,8 +96,23 @@
   }
 }
 
-.canvas {
+.canvasViewport {
   flex: 1;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  transition: filter 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &.canvasBlurred {
+    filter: blur(4px);
+    opacity: 0.55;
+  }
+}
+
+.projectsSlidePanel {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -105,16 +120,49 @@
   padding: 40px 24px;
   overflow-y: auto;
   box-sizing: border-box;
-  transition: filter 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  transform: translateX(0);
+  opacity: 1;
 
   &.hasProjects {
     justify-content: flex-start;
     padding-top: 56px;
   }
 
-  &.canvasBlurred {
-    filter: blur(4px);
-    opacity: 0.55;
+  &.slideLeft {
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
+.canvasSlidePanel {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  &.slideIn {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+    position: relative;
+  }
+
+  @media (max-width: 860px) {
+    &.slideIn {
+      overflow-y: auto;
+    }
   }
 }
 
@@ -284,9 +332,10 @@
   background: transparent;
   border: none;
   outline: none;
-  font-family: $font-serif;
-  font-size: 1.45rem;
+  font-family: $font-sans;
+  font-size: 1.35rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
   color: #ffffff;
   padding: 0;
   margin: 0;
@@ -325,11 +374,14 @@
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: color $transition-fast, background-color $transition-fast;
+  transition: color $transition-fast;
 
   &:hover {
     color: #f16b24;
-    background-color: rgba(241, 107, 36, 0.08);
+  }
+
+  &:active {
+    color: #d95a1b;
   }
 }
 
@@ -369,11 +421,11 @@
 }
 
 .projectName {
-  font-family: $font-serif;
-  font-size: 1.45rem;
+  font-family: $font-sans;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -535,16 +587,18 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 46px;
+  height: 48px;
   line-height: 1;
-  padding: 0 22px;
+  padding: 0 24px;
   border-radius: 30px;
   border: 1px solid #f16b24;
   background-color: #f16b24;
   color: #ffffff;
   font-family: $font-sans;
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  text-indent: 0.12em;
   cursor: pointer;
   box-sizing: border-box;
   transition: background-color $transition-fast, border-color $transition-fast;
@@ -611,16 +665,18 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 44px;
+  height: 48px;
   line-height: 1;
-  padding: 0 20px;
+  padding: 0 24px;
   border-radius: 30px;
   border: 1px solid #293444;
   background-color: #18202d;
   color: #f2f4f8;
   font-family: $font-sans;
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  text-indent: 0.12em;
   cursor: pointer;
   box-sizing: border-box;
   transition: background-color $transition-fast, border-color $transition-fast, color $transition-fast;
@@ -645,6 +701,194 @@
 }
 
 .logoutLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #8c96a5;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: #dc2626;
+  }
+}
+
+.projectSettingsSidebar {
+  position: fixed;
+  top: 52px;
+  bottom: 0;
+  right: 0;
+  width: 380px;
+  max-width: 90vw;
+  background-color: #10141c;
+  border: 1px solid #222937;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px 24px;
+  box-sizing: border-box;
+  z-index: 40;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &.open {
+    transform: translateX(0);
+  }
+}
+
+.settingsTopGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.projectSettingsTitle {
+  font-family: $font-sans;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0 0 24px;
+  padding-right: 32px;
+  word-break: break-word;
+
+  span {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8c96a5;
+    margin-top: 4px;
+  }
+}
+
+.settingsActions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.settingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.settingLabel {
+  font-family: $font-sans;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8c96a5;
+}
+
+.renameForm {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.renameInput {
+  flex: 1;
+  height: 44px;
+  background-color: #151a24;
+  border: 1px solid #263142;
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: $font-sans;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  padding: 0 14px;
+  outline: none;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: #f16b24;
+  }
+}
+
+.renameSaveBtn {
+  height: 44px;
+  padding: 0 16px;
+  background-color: #f16b24;
+  border: 1px solid #f16b24;
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: $font-sans;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: #d95a1b;
+  }
+}
+
+.sharpLinesToggleBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: 30px;
+  border: 1px solid #293444;
+  background-color: #18202d;
+  color: #f2f4f8;
+  font-family: $font-sans;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    background-color: #232e40;
+    border-color: #3c4b62;
+  }
+
+  &.active {
+    border-color: #439b38;
+    background-color: #162618;
+    color: #ffffff;
+
+    .toggleStateBadge {
+      background-color: #439b38;
+      color: #ffffff;
+    }
+  }
+}
+
+.toggleStateBadge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: #263142;
+  color: #8c96a5;
+  transition: background-color $transition-fast, color $transition-fast;
+}
+
+.deleteProjectWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.deleteProjectBtn {
   background: none;
   border: none;
   padding: 0;
