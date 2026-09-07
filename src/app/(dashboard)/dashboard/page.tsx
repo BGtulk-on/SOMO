@@ -15,10 +15,45 @@ export default function DashboardPage() {
   const [hasResolved, setHasResolved] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [projectName, setProjectName] = useState('New Project');
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerClose = () => {
+    if (!isCreating || isClosing) return;
+    setIsClosing(true);
+    closeTimerRef.current = setTimeout(() => {
+      setIsCreating(false);
+      setIsClosing(false);
+    }, 250);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isCreating || isClosing) return;
+
+    const handlePointerDown = (e: MouseEvent) => {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
+        triggerClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+    };
+  }, [isCreating, isClosing]);
 
   useEffect(() => {
     refetch().finally(() => {
@@ -65,7 +100,7 @@ export default function DashboardPage() {
   }, [session, isPending, hasResolved]);
 
   useEffect(() => {
-    if (isCreating && inputRef.current) {
+    if (isCreating && !isClosing && inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();
       const timer = setTimeout(() => {
@@ -74,19 +109,19 @@ export default function DashboardPage() {
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isCreating]);
+  }, [isCreating, isClosing]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (isCreating) setIsCreating(false);
+        if (isCreating) triggerClose();
         if (isPremiumOpen) setIsPremiumOpen(false);
         if (isAccountOpen) setIsAccountOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCreating, isPremiumOpen, isAccountOpen]);
+  }, [isCreating, isClosing, isPremiumOpen, isAccountOpen]);
 
   const handleSignOut = async () => {
     try {
@@ -99,6 +134,10 @@ export default function DashboardPage() {
   };
 
   const handleStartCreate = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
+    setIsClosing(false);
     setProjectName('New Project');
     setIsCreating(true);
   };
@@ -107,6 +146,11 @@ export default function DashboardPage() {
     e.preventDefault();
     const trimmed = projectName.trim();
     if (!trimmed) return;
+
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
+    setIsClosing(false);
 
     const tempId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
     const newProject: Project = {
@@ -180,7 +224,7 @@ export default function DashboardPage() {
           onClick={() => {
             setIsPremiumOpen(false);
             setIsAccountOpen(false);
-            setIsCreating(false);
+            if (isCreating) triggerClose();
           }}
           className={styles.tabHome}
         >
@@ -197,16 +241,14 @@ export default function DashboardPage() {
       </header>
 
       <main
-        onClick={(e) => {
-          if (e.target === e.currentTarget && isCreating) {
-            setIsCreating(false);
-          }
-        }}
         className={`${styles.canvas} ${projects.length > 0 || isCreating ? styles.hasProjects : ''} ${isPremiumOpen || isAccountOpen ? styles.canvasBlurred : ''}`}
       >
         {projects.length === 0 ? (
           isCreating ? (
-            <div className={styles.createProjectBox}>
+            <div
+              ref={boxRef}
+              className={`${styles.createProjectBox} ${isClosing ? styles.closing : ''}`}
+            >
               <form onSubmit={handleCreateProject} className={styles.createProjectForm}>
                 <div className={styles.inputWrapper}>
                   <input
@@ -227,7 +269,7 @@ export default function DashboardPage() {
               </form>
             </div>
           ) : (
-            <>
+            <div className={styles.emptyStateWrapper}>
               <div className={styles.shapesWrapper}>
                 <div className={styles.largeBox} />
                 <div className={styles.smallBox} />
@@ -243,12 +285,15 @@ export default function DashboardPage() {
                   Create new one?
                 </button>
               </div>
-            </>
+            </div>
           )
         ) : (
           <div className={styles.projectsContainer}>
             {isCreating && (
-              <div className={styles.createProjectBox}>
+              <div
+                ref={boxRef}
+                className={`${styles.createProjectBox} ${isClosing ? styles.closing : ''}`}
+              >
                 <form onSubmit={handleCreateProject} className={styles.createProjectForm}>
                   <div className={styles.inputWrapper}>
                     <input
