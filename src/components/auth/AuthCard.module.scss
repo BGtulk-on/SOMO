@@ -323,3 +323,59 @@
     color: $color-accent-hover;
   }
 }
+
+.verificationCard {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.verificationTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: $color-text-primary;
+  margin-bottom: 8px;
+}
+
+.verificationSubtitle {
+  font-size: 0.875rem;
+  color: $color-text-muted;
+  line-height: 1.5;
+  margin-bottom: 24px;
+
+  strong {
+    color: $color-text-primary;
+  }
+}
+
+.resendBtn {
+  background-color: $color-bg-elevated;
+  border: 1px solid $color-border;
+  color: $color-text-primary;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: background-color $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    background-color: #28303b;
+    border-color: $color-border-hover;
+  }
+}
+
+.resendInlineBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 6px;
+  display: block;
+  font-size: 0.75rem;
+  color: #fca5a5;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: #ffffff;
+  }
+}

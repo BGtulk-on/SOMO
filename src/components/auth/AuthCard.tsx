@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
-import { signIn, signUp } from '@/lib/auth-client';
+import { signIn, signUp, sendVerificationEmail } from '@/lib/auth-client';
 import styles from './AuthCard.module.scss';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,6 +27,8 @@ export function AuthCard({ initialMode }: AuthCardProps) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isVerificationSent, setIsVerificationSent] = useState(false);
+  const [resendStatus, setResendStatus] = useState('');
 
   const cardRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
@@ -67,6 +69,8 @@ export function AuthCard({ initialMode }: AuthCardProps) {
     }
 
     setErrorMessage('');
+    setIsVerificationSent(false);
+    setResendStatus('');
     setNameTouched(false);
     setEmailTouched(false);
     setPasswordTouched(false);
@@ -150,17 +154,29 @@ export function AuthCard({ initialMode }: AuthCardProps) {
     setMode(targetMode);
   };
 
-  const playSuccessAnimation = () => {
+  const playSuccessAnimation = (isRegister = false) => {
     if (!successBoxRef.current) {
-      window.location.href = '/dashboard';
+      if (isRegister) {
+        setIsVerificationSent(true);
+      } else {
+        window.location.href = '/dashboard';
+      }
       return;
     }
 
     const tl = gsap.timeline({
       onComplete: () => {
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 180);
+        if (isRegister) {
+          setIsVerificationSent(true);
+          gsap.to(successBoxRef.current, {
+            autoAlpha: 0,
+            duration: 0.35,
+          });
+        } else {
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 180);
+        }
       },
     });
 
@@ -218,6 +234,20 @@ export function AuthCard({ initialMode }: AuthCardProps) {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!email) return;
+    try {
+      await sendVerificationEmail({
+        email,
+        callbackURL: '/dashboard',
+      });
+      setResendStatus('Verification email resent!');
+      setTimeout(() => setResendStatus(''), 4000);
+    } catch {
+      setResendStatus('Failed to send verification email');
+    }
+  };
+
   const handlePasswordLogin = async () => {
     if (!email || !password) return;
     if (!isEmailValid || !password) {
@@ -237,12 +267,16 @@ export function AuthCard({ initialMode }: AuthCardProps) {
       });
 
       if (res?.error) {
-        setErrorMessage(res.error.message || 'Invalid email or password');
+        if (res.error.message?.toLowerCase().includes('verify') || res.error.status === 403) {
+          setErrorMessage('Please verify your email address before signing in.');
+        } else {
+          setErrorMessage(res.error.message || 'Invalid email or password');
+        }
         setIsLoading(false);
         return;
       }
 
-      playSuccessAnimation();
+      playSuccessAnimation(false);
     } catch (err: any) {
       setErrorMessage(err?.message || 'Authentication failed');
       setIsLoading(false);
@@ -275,7 +309,7 @@ export function AuthCard({ initialMode }: AuthCardProps) {
         return;
       }
 
-      playSuccessAnimation();
+      playSuccessAnimation(true);
     } catch (err: any) {
       setErrorMessage(err?.message || 'Registration failed');
       setIsLoading(false);
@@ -316,7 +350,20 @@ export function AuthCard({ initialMode }: AuthCardProps) {
           </div>
         </div>
 
-        {errorMessage && <div className={styles.errorBanner}>{errorMessage}</div>}
+        {errorMessage && (
+          <div className={styles.errorBanner}>
+            <div>{errorMessage}</div>
+            {errorMessage.toLowerCase().includes('verify') && (
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                className={styles.resendInlineBtn}
+              >
+                {resendStatus || 'Resend verification email'}
+              </button>
+            )}
+          </div>
+        )}
 
         <div ref={successBoxRef} className={styles.successBox}>
           <svg
@@ -333,8 +380,36 @@ export function AuthCard({ initialMode }: AuthCardProps) {
           </svg>
         </div>
 
-        <div
-          ref={passkeySectionRef}
+        {isVerificationSent ? (
+          <div className={styles.verificationCard}>
+            <h2 className={styles.verificationTitle}>Check your inbox</h2>
+            <p className={styles.verificationSubtitle}>
+              We sent a verification link to <strong>{email}</strong>. Please check your email to activate your workspace.
+            </p>
+            <button
+              type="button"
+              onClick={handleResendVerification}
+              className={styles.resendBtn}
+            >
+              {resendStatus || 'Resend verification email'}
+            </button>
+            <div className={styles.footer}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsVerificationSent(false);
+                  animateSwitch('LOGIN');
+                }}
+                className={styles.switchBtn}
+              >
+                Back to sign in
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div
+              ref={passkeySectionRef}
           className={styles.passkeySection}
           style={{
             height: initialMode === 'REGISTER' ? 0 : 'auto',
@@ -508,6 +583,8 @@ export function AuthCard({ initialMode }: AuthCardProps) {
             {mode === 'LOGIN' ? 'Create one' : 'Sign in'}
           </button>
         </div>
+        </>
+        )}
       </div>
     </div>
   );
